@@ -56,7 +56,6 @@ namespace mutex_controlled
 		template <typename ... Args>
 		cmutex_decor_compiletime(Args ... args): m_internal(std::forward<Args>(args)...) {}
 		
-		template <typename U = T>
 		void lock() {
 			traits_type::do_lock(m_internal);
 			try {
@@ -67,7 +66,6 @@ namespace mutex_controlled
 			}
 		}
 		
-		template <typename U = T>
 		bool try_lock() {
 			bool ret = traits_type::do_try_lock(m_internal);
 			if (ret) {
@@ -81,12 +79,12 @@ namespace mutex_controlled
 			return ret;
 		}
 		
-		template <typename U = T>
-		bool try_lock_for() {
-			bool ret = traits_type::do_try_lock_for(m_internal);
+		template <class Rep, class Period>
+		bool try_lock_for(const std::chrono::duration<Rep,Period> & rel_time) {
+			bool ret = traits_type::do_try_lock_for(m_internal, rel_time);
 			if (ret) {
 				try {
-					Strategy::try_lock_for();
+					Strategy::try_lock_for(rel_time);
 				} catch (...) {
 					traits_type::do_unlock(m_internal);
 					throw;
@@ -95,12 +93,12 @@ namespace mutex_controlled
 			return ret;
 		}
 		
-		template <typename U = T>
-		bool try_lock_until() {
-			bool ret = traits_type::do_try_lock_until(m_internal);
+		template <class Clock, class Duration>
+		bool try_lock_until(const std::chrono::time_point<Clock,Duration> & abs_time) {
+			bool ret = traits_type::do_try_lock_until(m_internal, abs_time);
 			if (ret) {
 				try {
-					Strategy::try_lock_until();
+					Strategy::try_lock_until(abs_time);
 				} catch (...) {
 					traits_type::do_unlock(m_internal);
 					throw;
@@ -109,7 +107,6 @@ namespace mutex_controlled
 			return ret;
 		}
 		
-		template <typename U = T>
 		void unlock() {
 			try{
 				traits_type::do_unlock(m_internal);
@@ -130,29 +127,29 @@ namespace mutex_controlled
 	template <typename T>
 	struct cmutex_traits_runtime
 	{
-		static void do_lock(T & obj)
+		static void do_lock(std::unique_ptr<T> & obj)
 		{
 			obj -> lock();
 		}
 		
-		static bool do_try_lock(T & obj)
+		static bool do_try_lock(std::unique_ptr<T> & obj)
 		{
 			return obj -> try_lock();
 		}
 		
 		template <class Rep, class Period>
-		static bool try_lock_for(T & obj, const std::chrono::duration<Rep,Period> & rel_time)
+		static bool try_lock_for(std::unique_ptr<T> & obj, const std::chrono::duration<Rep,Period> & rel_time)
 		{
 			return obj -> try_lock_for(rel_time);
 		}
 		
 		template <class Clock, class Duration>
-		static bool try_lock_until(T & obj, const std::chrono::time_point<Clock,Duration> & abs_time)
+		static bool try_lock_until(std::unique_ptr<T> & obj, const std::chrono::time_point<Clock,Duration> & abs_time)
 		{
 			return obj -> try_lock_until(abs_time);
 		}
 		
-		static void do_unlock(T & obj)
+		static void do_unlock(std::unique_ptr<T> & obj)
 		{
 			obj -> unlock();
 		}
@@ -179,7 +176,6 @@ namespace mutex_controlled
 			m_strategy(std::move(ptr_s))
 		{}
 		
-		template <typename U = T>
 		void lock() {
 			traits_type::do_lock(m_internal);
 			try {
@@ -191,7 +187,6 @@ namespace mutex_controlled
 			return;
 		}
 		
-		template <typename U = T>
 		bool try_lock() {
 			bool ret = traits_type::do_try_lock(m_internal);
 			if (ret) {
@@ -205,12 +200,12 @@ namespace mutex_controlled
 			return ret;
 		}
 		
-		template <typename U = T>
-		bool try_lock_for() {
-			bool ret = traits_type::do_try_lock_for(m_internal);
+		template <class Rep, class Period>
+		bool try_lock_for(const std::chrono::duration<Rep,Period> & rel_time) {
+			bool ret = traits_type::do_try_lock_for(m_internal, rel_time);
 			if (ret) {
 				try {
-					m_strategy -> try_lock_for();
+					m_strategy -> try_lock_for(rel_time);
 				} catch (...) {
 					traits_type::do_unlock(m_internal);
 					throw;
@@ -219,12 +214,12 @@ namespace mutex_controlled
 			return ret;
 		}
 		
-		template <typename U = T>
-		bool try_lock_until() {
-			bool ret = traits_type::do_try_lock_until(m_internal);
+		template <class Clock, class Duration>
+		bool try_lock_until(const std::chrono::time_point<Clock,Duration> & abs_time) {
+			bool ret = traits_type::do_try_lock_until(m_internal, abs_time);
 			if (ret) {
 				try {
-					m_strategy -> try_lock_until();
+					m_strategy -> try_lock_until(abs_time);
 				} catch (...) {
 					traits_type::do_unlock(m_internal);
 					throw;
@@ -233,7 +228,6 @@ namespace mutex_controlled
 			return ret;
 		}
 		
-		template <typename U = T>
 		void unlock() {
 			try {
 				traits_type::do_unlock(m_internal);

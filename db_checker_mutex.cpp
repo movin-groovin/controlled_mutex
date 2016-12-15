@@ -8,7 +8,7 @@ namespace mutex_controlled
 	
 	//
 	
-	thread_local ccounted_mutexes_strategy::counter_type ccounted_mutexes_strategy::m_cnt_call( 0 );
+	thread_local size_t ccount_lock_holder::m_count_lock = 0;
 	
 	//
 	
