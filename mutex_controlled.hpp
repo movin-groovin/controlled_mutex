@@ -15,7 +15,7 @@ namespace mutex_controlled
 	
 #ifndef NDEBUG
 	template <typename MT>
-	using counted_check_mytex_type = cmutex_decor_compiletime< MT, ccounted_mutexes_strategy >;
+	using counted_check_mytex_type = cmutex_decor_compiletime< MT, ccounted_mutexes_strategy<> >;
 	
 	void check_with_assert();
 	void check_with_exception ();
