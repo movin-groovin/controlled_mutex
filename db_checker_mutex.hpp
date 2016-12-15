@@ -4,6 +4,7 @@
 
 #include <atomic>
 #include <stdexcept>
+#include <chrono>
 
 #include <cassert>
 
@@ -14,34 +15,49 @@ namespace mutex_controlled
 	
 	//
 	
-	class ccounted_mutexes_strategy
+	class ccount_lock_holder
 	{
 	public:
-		using counter_type = std::atomic<size_t>;
-		
-	private:
-		thread_local static counter_type m_cnt_call;
-		
+		thread_local static size_t m_count_lock;
+	};
+	
+	class ccounted_mutexes_strategy
+	{
 	public:
 		
 		static void lock()
 		{
-			++m_cnt_call;
+			++ccount_lock_holder::m_count_lock;
 		}
 		
-		static void try_lock()
+		static bool try_lock()
 		{
-			++m_cnt_call;
+			++ccount_lock_holder::m_count_lock;
+			return true;
+		}
+		
+		template <class Rep, class Period>
+		static bool try_lock_for(const std::chrono::duration<Rep,Period> & rel_time)
+		{
+			++ccount_lock_holder::m_count_lock;
+			return true;
+		}
+		
+		template <class Clock, class Duration>
+		static bool try_lock_until(const std::chrono::time_point<Clock,Duration> & abs_time)
+		{
+			++ccount_lock_holder::m_count_lock;
+			return true;
 		}
 		
 		static void unlock() noexcept
 		{
-			--m_cnt_call;
+			--ccount_lock_holder::m_count_lock;
 		}
 		
 		static size_t get_count() noexcept
 		{
-			return m_cnt_call;
+			return ccount_lock_holder::m_count_lock;
 		}
 		
 		static void check_with_exception()

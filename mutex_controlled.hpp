@@ -4,6 +4,7 @@
 
 #include "decorators.hpp"
 #include "db_checker_mutex.hpp"
+#include "hierarchy_mutex.hpp"
 
 
 
