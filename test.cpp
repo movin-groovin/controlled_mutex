@@ -26,7 +26,7 @@ struct cmajor_minor2
 
 
 int main () {
-	using mutex_type = mutex_controlled::mutex_type<std::mutex>;
+	using mutex_type = mutex_controlled::mutex_type<std::mutex, 1>;
 	
 	mutex_type mut1;
 	
@@ -44,21 +44,14 @@ int main () {
 	std::cout << "\n\n";
 	
 	{
-		using mut_type1 = mutex_controlled::cmutex_decor_runtime< std::mutex, mutex_controlled::chierarchy_mutexes_strategy<cmajor_minor1> >;
-		mut_type1 mut1(
-			std::make_unique<std::mutex>(),
-			std::make_unique< mutex_controlled::chierarchy_mutexes_strategy<cmajor_minor1> >()
-		);
+		using mutex_type1 = mutex_controlled::mutex_type<std::mutex, 1>;
+		using mutex_type2 = mutex_controlled::mutex_type<std::mutex, 2>;
 		
-		using mut_type2 = mutex_controlled::cmutex_decor_runtime< std::mutex, mutex_controlled::chierarchy_mutexes_strategy<cmajor_minor2> >;
-		mut_type2 mut2(
-			std::make_unique<std::mutex>(),
-			std::make_unique< mutex_controlled::chierarchy_mutexes_strategy<cmajor_minor2> >()
-		);
+		mutex_type1 mut1;
+		mutex_type2 mut2;
 		
-		//std::lock_guard<mut_type1> lck1(mut1);
-		std::lock_guard<mut_type2> lck2(mut2);
-		std::lock_guard<mut_type1> lck1(mut1);
+		std::lock_guard<mutex_type2> lck2(mut2);
+		std::lock_guard<mutex_type1> lck1(mut1);
 		
 		std::cout << "Mark3\n";
 	}

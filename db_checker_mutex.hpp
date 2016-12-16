@@ -3,7 +3,6 @@
 #define DB_CHECKER_MUTEX_HPP_
 
 #include <atomic>
-#include <stdexcept>
 #include <chrono>
 
 #include <cassert>
@@ -58,12 +57,6 @@ namespace mutex_controlled
 		static size_t get_count() noexcept
 		{
 			return ccount_lock_holder::m_count_lock;
-		}
-		
-		static void check_with_exception()
-		{
-			if (get_count() > 0)
-				throw std::runtime_error("ccounted_mutexes_strategy: mutex lock counter more than 0");
 		}
 		
 		static void check_with_assert()

@@ -7,8 +7,9 @@ namespace mutex_controlled
 {
 	
 	//
-	
-	thread_local size_t cthread_level_holder::m_thread_current_level = cthread_level_holder::default_level;
+		
+	thread_local clevels_holder::counter_type clevels_holder::m_thread_level_major = clevels_holder::default_value;
+	thread_local clevels_holder::counter_type clevels_holder::m_thread_level_minor = clevels_holder::default_value;
 	
 	//
 	
